@@ -127,20 +127,22 @@ export function CartDrawer() {
       return;
     }
 
+    const effectiveFulfillment = fulfillmentType as FulfillmentType;
+
     let quoteForOrder = deliveryQuote;
-    if (fulfillmentType === "delivery" && (!quoteForOrder || quotedAddress !== address.trim())) {
+    if (effectiveFulfillment === "delivery" && (!quoteForOrder || quotedAddress !== address.trim())) {
       quoteForOrder = await calculateQuote(address);
       if (!quoteForOrder) return;
     }
 
-    if (fulfillmentType === "delivery" && quoteForOrder?.fee === null) {
+    if (effectiveFulfillment === "delivery" && quoteForOrder?.fee === null) {
       window.alert(
         "A distância já foi calculada, mas a regra de preço da entrega ainda não foi configurada pela loja. Por enquanto, escolha retirada no local ou aguarde a definição da tarifa.",
       );
       return;
     }
 
-    const feeForOrder = fulfillmentType === "delivery" ? quoteForOrder?.fee ?? 0 : 0;
+    const feeForOrder = effectiveFulfillment === "delivery" ? quoteForOrder?.fee ?? 0 : 0;
     const totalForOrder = subtotal + feeForOrder + business.siteUsageFee;
 
     if (paymentMethod === "Dinheiro") {
@@ -176,13 +178,13 @@ export function CartDrawer() {
           subtotal,
           notes,
           customerName,
-          fulfillmentType === "delivery" ? address : "",
-          fulfillmentType === "delivery" ? complement : "",
+          effectiveFulfillment === "delivery" ? address : "",
+          effectiveFulfillment === "delivery" ? complement : "",
           paymentMethod,
           paymentMethod === "Dinheiro" ? validCashValue : null,
-          fulfillmentType,
-          fulfillmentType === "delivery" ? quoteForOrder?.fee ?? 0 : null,
-          fulfillmentType === "delivery" ? quoteForOrder?.distanceKm ?? null : null,
+          effectiveFulfillment,
+          effectiveFulfillment === "delivery" ? quoteForOrder?.fee ?? 0 : null,
+          effectiveFulfillment === "delivery" ? quoteForOrder?.distanceKm ?? null : null,
         ),
       ),
       "_blank",
